@@ -1,0 +1,56 @@
+#define BLYNK_PRINT Serial
+#define BLYNK_TEMPLATE_ID "TMPL6AuiC3L1i"
+#define BLYNK_TEMPLATE_NAME "pump on and off"
+#define BLYNK_AUTH_TOKEN "AEJIWNdcYMkrZnOQv76vgHZf7yCktuVL"
+#include <ESP8266WiFi.h>
+ 
+#include <BlynkSimpleEsp8266.h>
+ 
+#define TRIG_PIN   D1 // ESP8266 pin D1 connected to Ultrasonic Sensor's TRIG pin
+#define ECHO_PIN   D2 // ESP8266 pin D2 connected to Ultrasonic Sensor's ECHO pin
+#define PUMP_PIN    D7 // ESP8266 pin D7 connected to LED's pin
+#define DISTANCE_THRESHOLD 50 // centimeters
+char auth[] = BLYNK_AUTH_TOKEN;
+char ssid[] = "OrangeFiber2.4G*";
+char pass[] = "123123";
+// variables will change:
+float duration_us, distance_cm;
+//BLYNK_WRITE(V0) {
+  //digitalWrite(PUMP_PIN, param.asInt());
+//}
+ 
+void setup() {
+  //pinMode(D0, OUTPUT);
+  //Initialize the Blynk library
+//Blynk.begin(auth, ssid, pass, "blynk.cloud", 80);
+  Serial.begin (9600);       // initialize serial port
+  
+  pinMode(TRIG_PIN, OUTPUT); // set ESP8266 pin to output mode
+  pinMode(ECHO_PIN, INPUT);  // set ESP8266 pin to input mode
+  pinMode(PUMP_PIN, OUTPUT);  // set ESP8266 pin to output mode
+}
+ 
+void loop() {
+// Blynk.run();
+  // generate 10-microsecond pulse to TRIG pin
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+ 
+  // measure duration of pulse from ECHO pin
+  duration_us = pulseIn(ECHO_PIN, HIGH);
+  // calculate the distance
+  distance_cm = 0.05 * duration_us;
+ 
+  if (distance_cm < DISTANCE_THRESHOLD)
+    digitalWrite(PUMP_PIN, HIGH); // turn on pump
+  else
+    digitalWrite(PUMP_PIN, LOW);  // turn off LED
+ 
+  // print the value to Serial Monitor
+  Serial.print("distance: ");
+  Serial.print(distance_cm);
+  Serial.println(" cm");
+ 
+  delay(500);
+}
